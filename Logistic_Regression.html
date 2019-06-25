@@ -387,30 +387,33 @@ $(document).ready(function () {
 <li>Calculate the odds ratio given by ad/bc.</li>
 </ol>
 <p>Step by step calculation:</p>
-<pre class="r"><code>#### Manual
-a&lt;- 5097 ### exposed with disease
-b &lt;- 1290 ### exposed with no disease
-c &lt;-439 ### non-exposed with disease
-d &lt;- 84 ### non-exposed with no disease
+<pre class="r"><code># Manual
+a&lt;- 5097 # exposed with disease
+b &lt;- 1290 # exposed with no disease
+c &lt;-439 # non-exposed with disease
+d &lt;- 84 # non-exposed with no disease
 
 exposed &lt;- a/b
 unexposed &lt;- c/d
 
 OR_disease &lt;- exposed/unexposed</code></pre>
 <p>Using the package <code>epitools</code> (install package first before R can utilise it from the library), which can also calculate the 95% confidence intervals:</p>
-<pre class="r"><code>#### if you want to use a package that will do this for you, load the epitools package. 
+<pre class="r"><code># if you want to use a package that will do this for you, load the epitools package. 
 library(epitools)
 oddsratio(OR_dia_ari, method =&quot;wald&quot;)</code></pre>
 <ol start="4" style="list-style-type: lower-alpha">
 <li>Now subject the same variables to a logistic regression, by using the package <code>MASS</code> (install package first)</li>
 </ol>
-<pre class="r"><code>### Step 1: 
+<pre class="r"><code># Step 1: 
 library(MASS)
-### Step 2: 
+
+# Step 2: 
 a &lt;- glm(utri$ARI~ utri$diabetes, family = binomial(link = logit))
-### Step 3: 
+
+# Step 3: 
 summary(a)
-### Step 4: 
+
+# Step 4: 
 exp(cbind(&quot;Odds ratio&quot; = coef(a), confint.default(a, level = 0.95)))</code></pre>
 <p>In this instance where we have only one independent variable, the equation looks like:</p>
 <p><span class="math display">\[\hat{g}{(x)}=log\frac{p}{(1-p)}=\beta_0+\beta_1x_1\]</span></p>
@@ -436,8 +439,6 @@ exp(cbind(&quot;Odds ratio&quot; = coef(a2), confint.default(a2, level = 0.95)))
 <p><strong>Task 5: (10 minutes)</strong> In the R script, type the following commands:</p>
 <pre class="r"><code>vars &lt;- list(utri$sex, utri$season)
  for (var in vars){
-   # tabulate with ARI
-   #print(var)
       x1 &lt;- glm(utri$ARI~ var, family = binomial(link = 'logit'),    na.action = na.exclude, data = utri)
       exp &lt;- exp(cbind(&quot;Odds ratio&quot; = coef(x1), confint.default(x1, level = 0.95)))
       print(exp)
@@ -447,24 +448,31 @@ exp(cbind(&quot;Odds ratio&quot; = coef(a2), confint.default(a2, level = 0.95)))
 <p>Before we go any further, there are a couple of variables here that we should examine a bit more closely. Two that had multiple levels were season and location. We should see how best to include these in any multivariable model. Here we are going to use the logistic command, which provides odds ratios.</p>
 <p><strong>Task 6: (5 minutes)</strong> In the R script type the following commands:</p>
 <pre class="r"><code>table(utri$season, utri$ARI) 
-### The GLM model 
+
+# The GLM model 
 x2 &lt;- glm(utri$ARI~ utri$season, family = binomial(link = 'logit')) 
-### To obtain the odds ratios: 
+
+# To obtain the odds ratios: 
 exp(cbind(&quot;Odds ratio&quot; = coef(x2), confint.default(x2, level = 0.95)))
 table(utri$location, utri$ARI)
-### The GLM model 
+
+# The GLM model 
 x3 &lt;- glm(utri$ARI~ utri$location, family = binomial(link = 'logit')) 
-### To obtain the odds ratios: 
+
+# To obtain the odds ratios: 
 exp(cbind(&quot;Odds ratio&quot; = coef(x3), confint.default(x3, level = 0.95)))</code></pre>
 <p><strong>What do you think about the odds ratios for these variables? What should we do with these when we proceed to including multiple variables in the model?</strong></p>
 <pre><code>The odds ratios are not consistent at different levels of these variables. In particular, winter (season 2) had a markedly stronger association with ARI than the reference category, which was autumn (season 1). We should include this variable as indicator variables in future models. For location, the only level that was significantly associated with ARI compared with the baseline of capital/major city was level 3, which was for a rural area. Remote areas had very few study subjects. Here we should create one variable for rural/remote compared to urban and see if that is worth including in future models.</code></pre>
 <p><strong>Task 7: (5 minutes)</strong> In the R script, create a new variable called ‘rural’:</p>
-<pre class="r"><code>## 1 = &quot;yes&quot;. i.e. &quot;if location column states &quot;Rural&quot; or &quot;Remote&quot;, then rural column entries will correspond to 1 (Yes), 0 = &quot;no&quot;, i.e. if location column contains anything else, then rural column will correspond to 'no'
-utri$rural &lt;- ifelse(utri$location ==&quot;Rural&quot; | utri$location ==&quot;Remote&quot;, 1,0) ## creating the new variable &quot;rural&quot;
-utri$rural &lt;- factor(utri$rural, levels = c(0,1), labels = c(&quot;No&quot;, &quot;Yes&quot;)) #### this is where the yes/no labels are defined
+<pre class="r"><code># 1 = &quot;yes&quot;. i.e. &quot;if location column states &quot;Rural&quot; or &quot;Remote&quot;, then rural column entries will correspond to 1 (Yes), 0 = &quot;no&quot;, i.e. if location column contains anything else, then rural column will correspond to 'no'
+
+utri$rural &lt;- ifelse(utri$location ==&quot;Rural&quot; | utri$location ==&quot;Remote&quot;, 1,0) # creating the new variable &quot;rural&quot;
+
+utri$rural &lt;- factor(utri$rural, levels = c(0,1), labels = c(&quot;No&quot;, &quot;Yes&quot;)) # this is where the yes/no labels are defined
+
 table(utri$ARI,utri$rural)
 
-### GLM model:
+# GLM model:
     x4 &lt;- glm(utri$ARI~ utri$rural, family = binomial(link = 'logit')) 
     exp(cbind(&quot;Odds ratio&quot; = coef(x4), confint.default(x4, level = 0.95)))</code></pre>
 </div>
@@ -487,7 +495,9 @@ table(utri$ARI,utri$rural)
 <pre><code>In the logistic model, there are several variables with p&lt;0.05, including age_cat, sex, season, asthma, immunocompromised, household size, and rural. Interestingly, sex is now significant when included with age_cat, which may indicate that the association varies across age categories. These variables should be retained in the model and diabetes, travel, LOTE and ATSI removed.</code></pre>
 <p><strong>Task 9: (10 minutes)</strong> Run the full model and the reduced model, as we will compare them using a likelihood ratio test (you will need the <code>lmtest</code> package for this). To do this we will store the estimates from the first model and compare them to the second. In the command line type:</p>
 <pre class="r"><code>fm1 &lt;- glm(ARI ~ sex + age_cat + season + asthma + immunocompromised+ household_size + diabetes + travel + LOTE + ATSI, family = binomial(link = 'logit'), data = utri)
+
 fm2 &lt;- glm(ARI ~ sex + age_cat + season + asthma + immunocompromised+ household_size, family = binomial(link = 'logit'),data = utri)
+
 library(lmtest)
 lrtest(fm1, fm2)</code></pre>
 <p>From this we can see that the Chi square test is p&gt;0.05, which indicates that the variables we have removed did not significantly contribute to the understanding of the risk of ARI. Once we are comfortable that this reduced model contains all the necessary variables, we would call it our ‘main effects model’.</p>
@@ -497,15 +507,18 @@ lrtest(fm1, fm2)</code></pre>
 <p>Assessing interactions is a complex topic, as it involves assessing variation of effect in one variable across another. When the odds ratio for one variable is not constant over the levels of another, the two variables are said to have a statistical interaction. In this session, we are going to examine the potential interactions between two variables age_cat and sex. We might expect that the risk of ARI might vary across age groups by sex, particularly in females of childbearing age given the high prevalence of ARI in children.</p>
 <p><strong>Task 10: (10 minutes):</strong> We will run a simple logistic regression model that includes an interaction term where sex and age are combined. The package <code>margins</code> is an effort to port Stata’s (closed source) margins command to R as an S3 generic method for calculating the marginal effects (or “partial effects”) of covariates included in model objects (like those of classes “lm” and “glm”).</p>
 <pre class="r"><code>fm3 &lt;- glm(ARI~ sex*age_cat, family = binomial(link = 'logit'), data = utri)
+
 library(margins)
-summary(margins(fm3))#### this allows you to obtain outputs that look similar to STATA
-margins(fm3) ### calculates the average marginal effects
-#to obtain predicted values of ARI from model fm3
-pred &lt;- predict(fm3)
-#To calculate probability of ARI =1
-prob &lt;- exp(pred)/(1+exp(pred))
-#To generate interaction plots
-interaction.plot(utri$age_cat, utri$sex, prob)</code></pre>
+
+summary(margins(fm3)) # this allows you to obtain outputs that look similar to STATA
+
+margins(fm3) # calculates the average marginal effects
+
+pred &lt;- predict(fm3) # to obtain predicted values of ARI from model fm3
+
+prob &lt;- exp(pred)/(1+exp(pred)) # to calculate probability of ARI =1
+
+interaction.plot(utri$age_cat, utri$sex, prob) # to generate interaction plots</code></pre>
 <p>When examining for interaction, we should interpret results as if it was a stratified analysis. We are looking to examine risks of sub-categories by combinations of variables. In a moderately large dataset like this one examining ARI, we are able to stratify over many levels of a variable, such as age_cat that has 18 levels when combined with sex.</p>
 <p>In the end we will conclude that the variable is either:</p>
 <ol style="list-style-type: decimal">
@@ -521,17 +534,20 @@ interaction.plot(utri$age_cat, utri$sex, prob)</code></pre>
 <p>There are many different ways assessing whether a model fits the data adequately. The term ‘goodness of fit’ really means whether the probabilities produced by the model accurately reflect the data. To finish of the session, we will do two things: calculate some summary test statistics (using the <code>ResourceSelection</code> package) and examine how well the model classifies the data (using the <code>pROC</code> package for visualisation).</p>
 <p>The Hosmer-Lemeshow goodness of fit test is one of the best ways of assessing the fit of logistic models. The Hosmer and Lemeshow goodness-of-fit test assesses predicted frequency and those observed in the data. A large p value for the Hosmer and Lemeshow test indicates a well-fitting model.</p>
 <p><strong>Task 11: (10 minutes):</strong> Run the main effects model again and follow it up with some post-estimation commands. In the command line type:</p>
-<pre class="r"><code>## a. 
+<pre class="r"><code># a. 
 fm4 &lt;- glm(ARI ~ sex + age_cat + season + asthma +immunocompromised+ household_size, family = binomial(link = 'logit'), data = utri)
-## b. 
+
+# b. 
 library(ResourceSelection)
 hoslem.test(utri$ARI, fitted(fm4), g =10)
-## c. to plot ROC curve
+
+# c. to plot ROC curve
 prob=predict(fm4,type=c(&quot;response&quot;))
 fm4$prob=prob
-library(pROC) ## allows you to visualise the ROC curve
+library(pROC) # allows you to visualise the ROC curve
 g &lt;- roc(utri$ARI ~ prob)
 plot(g)  
+
 # d. to calculate AUC (area under the curve)
 auc(g)</code></pre>
 <p>The 10 groups are often referred to as ‘deciles of risk’ for the outcome, which in this case is ARI. The columns show the number of observed cases of ARI or not from the data versus the expected number from the main effects model. Ideally, there would be good agreement between the two columns. In addition, the probability of the summary measure of the Hosmer-Lemeshow Chi-square test &gt;0.05 indicating a good model fit.</p>

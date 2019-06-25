@@ -4,6 +4,7 @@ subtitle: "Logistic Regression"
 author: ""
 date: "23/06/2019"
 output: html_document
+
 ---
 
 ```{r setup, include=FALSE}
@@ -190,11 +191,11 @@ c) Calculate the odds ratio given by ad/bc.
 Step by step calculation:
 
 ```{r }
-#### Manual
-a<- 5097 ### exposed with disease
-b <- 1290 ### exposed with no disease
-c <-439 ### non-exposed with disease
-d <- 84 ### non-exposed with no disease
+# Manual
+a<- 5097 # exposed with disease
+b <- 1290 # exposed with no disease
+c <-439 # non-exposed with disease
+d <- 84 # non-exposed with no disease
 
 exposed <- a/b
 unexposed <- c/d
@@ -206,7 +207,8 @@ OR_disease <- exposed/unexposed
 Using the package `epitools` (install package first before R can utilise it from the library), which can also calculate the 95% confidence intervals:
 
 ``` {r,eval=FALSE}
-#### if you want to use a package that will do this for you, load the epitools package. 
+
+# if you want to use a package that will do this for you, load the epitools package. 
 library(epitools)
 oddsratio(OR_dia_ari, method ="wald")
 
@@ -215,13 +217,16 @@ oddsratio(OR_dia_ari, method ="wald")
 d)	Now subject the same variables to a logistic regression, by using the package `MASS` (install package first)
 
 ```{r, eval=FALSE}
-### Step 1: 
+# Step 1: 
 library(MASS)
-### Step 2: 
+
+# Step 2: 
 a <- glm(utri$ARI~ utri$diabetes, family = binomial(link = logit))
-### Step 3: 
+
+# Step 3: 
 summary(a)
-### Step 4: 
+
+# Step 4: 
 exp(cbind("Odds ratio" = coef(a), confint.default(a, level = 0.95)))
 
 
@@ -269,8 +274,6 @@ Now we are going to conduct logistic regressions of the remaining variables in t
 ```{r,eval=FALSE}
 vars <- list(utri$sex, utri$season)
  for (var in vars){
-   # tabulate with ARI
-   #print(var)
       x1 <- glm(utri$ARI~ var, family = binomial(link = 'logit'),    na.action = na.exclude, data = utri)
       exp <- exp(cbind("Odds ratio" = coef(x1), confint.default(x1, level = 0.95)))
       print(exp)
@@ -289,14 +292,18 @@ Before we go any further, there are a couple of variables here that we should ex
 **Task 6: (5 minutes)** In the R script type the following commands:
 ```{r, eval=FALSE}
 table(utri$season, utri$ARI) 
-### The GLM model 
+
+# The GLM model 
 x2 <- glm(utri$ARI~ utri$season, family = binomial(link = 'logit')) 
-### To obtain the odds ratios: 
+
+# To obtain the odds ratios: 
 exp(cbind("Odds ratio" = coef(x2), confint.default(x2, level = 0.95)))
 table(utri$location, utri$ARI)
-### The GLM model 
+
+# The GLM model 
 x3 <- glm(utri$ARI~ utri$location, family = binomial(link = 'logit')) 
-### To obtain the odds ratios: 
+
+# To obtain the odds ratios: 
 exp(cbind("Odds ratio" = coef(x3), confint.default(x3, level = 0.95)))
 ```
 
@@ -309,12 +316,15 @@ exp(cbind("Odds ratio" = coef(x3), confint.default(x3, level = 0.95)))
 **Task 7: (5 minutes)** In the R script, create a new variable called ‘rural’:
 ```{r,eval=FALSE}
 
-## 1 = "yes". i.e. "if location column states "Rural" or "Remote", then rural column entries will correspond to 1 (Yes), 0 = "no", i.e. if location column contains anything else, then rural column will correspond to 'no'
-utri$rural <- ifelse(utri$location =="Rural" | utri$location =="Remote", 1,0) ## creating the new variable "rural"
-utri$rural <- factor(utri$rural, levels = c(0,1), labels = c("No", "Yes")) #### this is where the yes/no labels are defined
+# 1 = "yes". i.e. "if location column states "Rural" or "Remote", then rural column entries will correspond to 1 (Yes), 0 = "no", i.e. if location column contains anything else, then rural column will correspond to 'no'
+
+utri$rural <- ifelse(utri$location =="Rural" | utri$location =="Remote", 1,0) # creating the new variable "rural"
+
+utri$rural <- factor(utri$rural, levels = c(0,1), labels = c("No", "Yes")) # this is where the yes/no labels are defined
+
 table(utri$ARI,utri$rural)
 
-### GLM model:
+# GLM model:
 	x4 <- glm(utri$ARI~ utri$rural, family = binomial(link = 'logit')) 
 	exp(cbind("Odds ratio" = coef(x4), confint.default(x4, level = 0.95)))
 ```
@@ -356,7 +366,9 @@ glm(ARI ~ sex + age_cat + season + asthma +immunocompromised+ household_size + d
 
 ```{r,eval=FALSE}
 fm1 <- glm(ARI ~ sex + age_cat + season + asthma + immunocompromised+ household_size + diabetes + travel + LOTE + ATSI, family = binomial(link = 'logit'), data = utri)
+
 fm2 <- glm(ARI ~ sex + age_cat + season + asthma + immunocompromised+ household_size, family = binomial(link = 'logit'),data = utri)
+
 library(lmtest)
 lrtest(fm1, fm2)
 
@@ -372,15 +384,18 @@ Assessing interactions is a complex topic, as it involves assessing variation of
 
 ```{r,eval=FALSE}
 fm3 <- glm(ARI~ sex*age_cat, family = binomial(link = 'logit'), data = utri)
+
 library(margins)
-summary(margins(fm3))#### this allows you to obtain outputs that look similar to STATA
-margins(fm3) ### calculates the average marginal effects
-#to obtain predicted values of ARI from model fm3
-pred <- predict(fm3)
-#To calculate probability of ARI =1
-prob <- exp(pred)/(1+exp(pred))
-#To generate interaction plots
-interaction.plot(utri$age_cat, utri$sex, prob)
+
+summary(margins(fm3)) # this allows you to obtain outputs that look similar to STATA
+
+margins(fm3) # calculates the average marginal effects
+
+pred <- predict(fm3) # to obtain predicted values of ARI from model fm3
+
+prob <- exp(pred)/(1+exp(pred)) # to calculate probability of ARI =1
+
+interaction.plot(utri$age_cat, utri$sex, prob) # to generate interaction plots
 ```
 
 When examining for interaction, we should interpret results as if it was a stratified analysis. We are looking to examine risks of sub-categories by combinations of variables. In a moderately large dataset like this one examining ARI, we are able to stratify over many levels of a variable, such as age_cat that has 18 levels when combined with sex.
@@ -406,17 +421,20 @@ The Hosmer-Lemeshow goodness of fit test is one of the best ways of assessing th
 **Task 11: (10 minutes):** Run the main effects model again and follow it up with some post-estimation commands. In the command line type:
 
 ```{r,eval=FALSE}
-## a. 
+# a. 
 fm4 <- glm(ARI ~ sex + age_cat + season + asthma +immunocompromised+ household_size, family = binomial(link = 'logit'), data = utri)
-## b. 
+
+# b. 
 library(ResourceSelection)
 hoslem.test(utri$ARI, fitted(fm4), g =10)
-## c. to plot ROC curve
+
+# c. to plot ROC curve
 prob=predict(fm4,type=c("response"))
 fm4$prob=prob
-library(pROC) ## allows you to visualise the ROC curve
+library(pROC) # allows you to visualise the ROC curve
 g <- roc(utri$ARI ~ prob)
 plot(g)  
+
 # d. to calculate AUC (area under the curve)
 auc(g)
 ```
