@@ -1,3 +1,4 @@
 # ReCon_Rcourse
+Logistic Regression course:
 
-1. Data Management 
+Materials originally in STATA but has been converted to R. 
