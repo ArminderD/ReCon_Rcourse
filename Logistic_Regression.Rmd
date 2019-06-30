@@ -147,19 +147,19 @@ Table: Table 1. Data dictionary for utri.csv data
  | :------------ | :-----------: | -------------------: |
  |id	           |Unique identification number|         	Numeric|
 | ARI	| Acute Respiratory Infection in past 4 weeks	|Numeric: 0,1|
-|age_cat	|Age group of study subject|	Numeric: 0, 5, 10, …65+ |
-|sex	|Sex of study subject	|Numeric: 0,1|
-|pregnant	|Study subject was pregnant	|Numeric: 0,1|
-|season|	Season person was interviewed	|Numeric: 1-4|
-|diabetes	|Study subject had diabetes	|Numeric: 0,1|
-|asthma	|Study subject had asthma	|Numeric: 0, 1|
-|immunocompromised	|Study subject was immunocompromised|	Numeric: 0, 1|
+|age_cat	|Age group of study subject|	Character: age cagetories|
+|sex	|Sex of study subject	|Character: female, male|
+|pregnant	|Study subject was pregnant	|Character: yes, no|
+|season|	Season person was interviewed	|Character|
+|diabetes	|Study subject had diabetes	|Character: yes, no|
+|asthma	|Study subject had asthma	|Character: yes, no|
+|immunocompromised	|Study subject was immunocompromised|	Character: yes, no|
 |household_size	|Number of people living in house|	Numeric|
-|travel 	|Study subject travelled prior to illness	|Numeric: 0, 1|
-|location	|Location of home|	Numeric: 1-4|
-|LOTE	|Language other than English spoken at home|	Numeric: 0, 1|
-|ATSI	|Study subject is Aboriginal/Torres Strait Islander	|Numeric: 0, 1|
-|state_r	|State of residence|	Numeric:1-7|
+|travel 	|Study subject travelled prior to illness	|Character: yes, no|
+|location	|Location of home|	Character|
+|LOTE	|Language other than English spoken at home|	Character: yes, no|
+|ATSI	|Study subject is Aboriginal/Torres Strait Islander	|Character: yes, no|
+|state_r	|State of residence|	Character |
 |month|	Month of interview|	Numeric: 1-12|
 |stweight	|Inverse probability of selection in State or Territory	|Numeric|
 |agesex_cat	|Age sex category by State|	Numeric|
@@ -233,7 +233,7 @@ exp(cbind("Odds ratio" = coef(a), confint.default(a, level = 0.95)))
 
 ```
 
-In this instance where we have only one independent variable, the equation looks like:
+In this instance where we have only one independent variable, the logistic regression equation looks like:
 
 $$\hat{g}{(x)}=log\frac{p}{(1-p)}=\beta_0+\beta_1x_1$$
 
@@ -346,7 +346,7 @@ In this exercise, we are going to purposefully select covariates for inclusion i
 
 1.	Careful univariable analysis to identify candidates, with p>0.25 as a screening level, for multivariable analysis.
 
-2.	Fit the multivariable model using variables decided at step 1. Following this, assess the importance of each variable using p values at traditional levels of significance. Drop variable from the model that do not meet p value cut-offs.
+2.	Fit the multivariable model using variables decided at step 1. Following this, assess the importance of each variable using p values at traditional levels of significance. Drop variables from the model that do not meet p value cut-offs.
 
 3.	Compare the reduced model to the original model using a likelihood ratio test and assess the change in coefficients.
 
@@ -459,7 +459,7 @@ The pROC package produces a ‘Receiver Operator Curve’ and calculates the are
 +	<0.6—No or poor discrimination
 +	0.7-0.8—Acceptable discrimination
 + 0.8-0.9—Excellent discrimination
-+	>0.9—Outstanding discrimination
++ $>$ 0.9—Outstanding discrimination
 
 
 **Discuss the results of the goodness of fit tests. What do you think of the performance of the main effects model now?**
