@@ -287,7 +287,7 @@ Review the results of these analyses and fill in the following table using univa
 knitr::include_graphics("log_reg_ARI.png")
 ```
 
-Before we go any further, there are a couple of variables here that we should examine a bit more closely. Two that had multiple levels were season and location. We should see how best to include these in any multivariable model. Here we are going to use the logistic command, which provides odds ratios.
+Before we go any further, there are a couple of variables here that we should examine a bit more closely. Two that had multiple levels were season and location. We should see how best to include these in any multivariable model. 
 
 **Task 6: (5 minutes)** In the R script type the following commands:
 ```{r, eval=FALSE}
@@ -310,7 +310,7 @@ exp(cbind("Odds ratio" = coef(x3), confint.default(x3, level = 0.95)))
 
 **What do you think about the odds ratios for these variables? What should we do with these when we proceed to including multiple variables in the model?**
 
-    The odds ratios are not consistent at different levels of these variables. In particular, winter (season 2) had a markedly stronger association with ARI than the reference category, which was autumn (season 1). We should include this variable as indicator variables in future models. For location, the only level that was significantly associated with ARI compared with the baseline of capital/major city was level 3, which was for a rural area. Remote areas had very few study subjects. Here we should create one variable for rural/remote compared to urban and see if that is worth including in future models.
+    The odds ratios are not consistent at different levels of these variables. In particular, winter had a markedly stronger association with ARI than the reference category, which was autumn. We should include this variable as indicator variables in future models. For location, the only level that was significantly associated with ARI compared with the baseline of capital/major city, which was for a rural area. Remote areas had very few study subjects. Here we should create one variable for rural/remote compared to urban and see if that is worth including in future models.
 
 
 **Task 7: (5 minutes)** In the R script, create a new variable called ‘rural’:
